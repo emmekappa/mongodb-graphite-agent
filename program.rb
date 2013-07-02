@@ -4,6 +4,7 @@ require 'simple-graphite'
 require 'bson'
 require 'socket'
 require 'awesome_print'
+require 'op_counters_sample'
 
 module Utils
   def to_hash(s)
@@ -54,7 +55,26 @@ puts @hash["indexCounters"]["missRatio"]
 
 @asd = Utils.to_hash(@hash) #all metrics
 
+
 #ap(@asd)
+
+
+
+@lastsample = @hash["opcounters"]
+
+if(File.exist? 'lastsample')
+  File.open('lastsample', 'r') do |file|
+    ap(Marshal.load(file))
+  end
+end
+
+@opCounterSample = OpCountersSample.new(@lastsample)
+
+File.open('lastsample', 'w') do |file|
+  Marshal.dump(@opCounterSample, file)
+end
+
+
 
 @g.send_metrics({"#{Socket.gethostname}.connections.current" => @hash["connections"]["current"]})
 
