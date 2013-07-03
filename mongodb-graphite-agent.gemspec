@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bson_ext'
   spec.add_dependency 'awesome_print'
   spec.add_dependency 'time_difference'
+  spec.add_dependency 'trollop'
 end

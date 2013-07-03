@@ -12,8 +12,11 @@ require 'mongodb/graphite/agent/op_counters_sample'
 module Mongodb
   module Graphite
     module Agent
-      def self.run
-        @connection = Mongo::MongoClient.new("localhost", 27017, :slave_ok => true)
+      def self.run(opts)
+        @connection = Mongo::MongoClient.new(opts.mongodb_host, opts.mongodb_port, :slave_ok => true)
+        unless(opts.mongodb_username.empty? && opts.mongodb_password.empty?)
+          @connection["admin"].authenticate(opts.mongodb_username, opts.mongodb_password)
+        end
 
         @hash = @connection["local"].command('serverStatus' => 1)
 

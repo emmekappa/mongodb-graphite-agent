@@ -21,6 +21,7 @@
     <orderEntry type="library" scope="PROVIDED" name="simple-graphite (v2.1.0, ruby-1.9.3-p429) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="thread_safe (v0.1.0, ruby-1.9.3-p429) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="time_difference (v0.2.0, ruby-1.9.3-p429) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="trollop (v2.0, ruby-1.9.3-p429) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="tzinfo (v0.3.37, ruby-1.9.3-p429) [gem]" level="application" />
   </component>
 </module>
