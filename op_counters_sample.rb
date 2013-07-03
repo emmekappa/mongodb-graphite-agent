@@ -13,7 +13,7 @@ class OpCountersSample
   end
 
   def marshal_load array
-    @sample_time, @name  = array
+    @sample_time, @values  = array
   end
 
 end
