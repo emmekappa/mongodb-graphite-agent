@@ -20,7 +20,7 @@ module Mongodb
 
         @hash = @connection["local"].command('serverStatus' => 1)
 
-        @g = ::Graphite.new({:host => "localhost", :port => 2003})
+        @graphite_writer = GraphiteWriter.new(opts[:graphite_host], opts[:graphite_port])
 
 #puts @hash["connections"]["current"]
 #puts @hash["connections"]["available"]
@@ -38,7 +38,7 @@ module Mongodb
 
         @asd = Utils.to_hash(@hash) #all metrics
 
-#ap(@asd)
+        ap @asd.select {|k| k.match("connection") }
 
 
         @current_sample = OpCountersSample.new Hash[@hash["opcounters"]]
@@ -52,23 +52,28 @@ module Mongodb
           end
         end
 
-        puts "Delta: "
         @delta = TimeDifference.between(Time.parse(@current_sample.sample_time), Time.parse(@previous_sample.sample_time))
-        puts @delta.in_seconds
+        puts "Last sample was taken #{@delta.in_seconds.round(0)} seconds ago" if opts[:verbose]
 
         @previous_sample.values.keys.sort.each do |k|
           previous_sample_value = @previous_sample.values[k]
           current_sample_value = @current_sample.values[k]
           value_per_seconds = ((current_sample_value - previous_sample_value) / @delta.in_seconds).round(2)
-          puts "#{k}: #{previous_sample_value} / #{current_sample_value}: #{value_per_seconds}/s"
+          puts "#{k}: #{previous_sample_value} / #{current_sample_value}: #{value_per_seconds}/s" if opts[:verbose]
         end
 
         File.open('lastsample', 'w') do |file|
           Marshal.dump(@current_sample, file)
         end
 
-        #@g.send_metrics({"#{Socket.gethostname}.connections.current" => @hash["connections"]["current"]})
+        unless(opts[:dry_run])
+          puts "Sending data to graphite" if opts[:verbose]
+          @graphite_writer.write("connections.current" => @hash["connections"]["current"])
+        end
       end
     end
   end
+end
+class GraphiteWriter
+
 end

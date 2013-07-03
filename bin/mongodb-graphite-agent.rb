@@ -4,6 +4,7 @@ $:.unshift File.expand_path("#{File.dirname(__FILE__)}/../lib")
 
 require 'trollop'
 require 'mongodb/graphite/agent'
+require 'mongodb/graphite/agent/graphite_writer'
 
 opts = Trollop::options do
   opt :mongodb_username, "MongoDB username", :type => :string
@@ -12,6 +13,12 @@ opts = Trollop::options do
   opt :mongodb_password, "MongoDB password", :type => :string
   opt :graphite_host, "Graphite host", :type => :string
   opt :graphite_port, "Graphite port", :type => :string
+  opt :dry_run, "Dry run", :type => :boolean, :default => false
+  opt :verbose, "Verbose", :type => :boolean, :default => false
 end
 
+puts "This is a dry run" if opts[:dry_run]
+
+#@writer = Mongodb::Graphite::Agent::GraphiteWriter.new("localhost", 12)
+#@writer.write ({ "antani" => 5, "boh" => 1 })
 Mongodb::Graphite::Agent.run(opts)

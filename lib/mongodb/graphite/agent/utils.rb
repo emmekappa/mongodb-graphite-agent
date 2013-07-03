@@ -21,7 +21,7 @@ module Mongodb
         end
 
         def self.to_hash(s)
-          json_descent([], s).flatten
+          json_descent([], s).flatten.reduce Hash.new, :merge
         end
       end
     end
