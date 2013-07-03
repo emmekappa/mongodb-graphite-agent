@@ -14,12 +14,11 @@ module Mongodb
     module Agent
       def self.run(opts)
         @connection = Mongo::MongoClient.new(opts.mongodb_host, opts.mongodb_port, :slave_ok => true)
-        unless(opts.mongodb_username.empty? && opts.mongodb_password.empty?)
+        unless(opts[:mongodb_username].blank? && opts[:mongodb_password].blank?)
           @connection["admin"].authenticate(opts.mongodb_username, opts.mongodb_password)
         end
 
         @hash = @connection["local"].command('serverStatus' => 1)
-
 
         @g = ::Graphite.new({:host => "localhost", :port => 2003})
 
@@ -38,7 +37,6 @@ module Mongodb
 #puts @hash["indexCounters"]["missRatio"]
 
         @asd = Utils.to_hash(@hash) #all metrics
-
 
 #ap(@asd)
 

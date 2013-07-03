@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.absolute_path("#{File.dirname(__FILE__)}/../lib")
+$:.unshift File.expand_path("#{File.dirname(__FILE__)}/../lib")
 
 require 'trollop'
-require "mongodb/graphite/agent"
+require 'mongodb/graphite/agent'
 
 opts = Trollop::options do
   opt :mongodb_username, "MongoDB username", :type => :string
