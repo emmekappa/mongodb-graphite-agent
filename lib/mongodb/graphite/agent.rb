@@ -20,7 +20,7 @@ module Mongodb
 
         @hash = @connection["local"].command('serverStatus' => 1)
 
-        @graphite_writer = GraphiteWriter.new(opts[:graphite_host], opts[:graphite_port])
+        @graphite_writer = GraphiteWriter.new(opts[:graphite_host], opts[:graphite_port], opts[:verbose])
 
 #puts @hash["connections"]["current"]
 #puts @hash["connections"]["available"]
@@ -37,8 +37,6 @@ module Mongodb
 #puts @hash["indexCounters"]["missRatio"]
 
         @asd = Utils.to_hash(@hash) #all metrics
-
-        ap @asd.select {|k| k.match("connection") }
 
 
         @current_sample = OpCountersSample.new Hash[@hash["opcounters"]]
@@ -66,10 +64,8 @@ module Mongodb
           Marshal.dump(@current_sample, file)
         end
 
-        unless(opts[:dry_run])
-          puts "Sending data to graphite" if opts[:verbose]
-          @graphite_writer.write("connections.current" => @hash["connections"]["current"])
-        end
+        @graphite_writer.write( @asd.select {|k| k.match('^connection|^network\.|^cursors|^mem\.mapped|^indexCounters|^repl.oplog') } )
+        #@graphite_writer.write("connections.current" => @hash["connections"]["current"]) unless(opts[:dry_run])
       end
     end
   end

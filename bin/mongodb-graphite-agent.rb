@@ -17,7 +17,10 @@ opts = Trollop::options do
   opt :verbose, "Verbose", :type => :boolean, :default => false
 end
 
-puts "This is a dry run" if opts[:dry_run]
+if opts[:dry_run]
+  puts "\n\nWARNING!!! This is a dry run\n\n\n"
+  sleep 1
+end
 
 #@writer = Mongodb::Graphite::Agent::GraphiteWriter.new("localhost", 12)
 #@writer.write ({ "antani" => 5, "boh" => 1 })
