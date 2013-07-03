@@ -5,7 +5,7 @@ require 'mongodb/graphite/agent/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "mongodb-graphite-agent"
-  spec.version       = MongoDbGraphiteAgent::VERSION
+  spec.version       = Mongodb::Graphite::Agent::VERSION
   spec.authors       = ["Michele Cantelli"]
   spec.email         = ["michele.cantelli@jobrapido.com"]
   spec.description   = ""
