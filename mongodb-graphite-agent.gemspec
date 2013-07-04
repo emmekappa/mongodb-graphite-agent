@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["michele.cantelli@jobrapido.com"]
   spec.description   = ""
   spec.summary       = ""
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/emmekappa/mongodb-graphite-agent"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
