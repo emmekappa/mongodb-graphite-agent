@@ -2,14 +2,14 @@ module Mongodb
   module Graphite
     module Agent
       class GraphiteWriter
-        def initialize(host, port, verbose)
-          @graphite = ::Graphite.new({:host => host, :port => port})
-          @verbose = verbose
+        def initialize(opts)
+          @graphite = ::Graphite.new({:host => opts[:host], :port => opts[:port]})
+          @opts = opts
         end
 
         def write(metric_hash)
-          @metric_hash_with_hostname = Hash[metric_hash.map { |k,v| ["#{Socket.gethostname}.mongodb.#{k}", v]}]
-          if @verbose
+          @metric_hash_with_hostname = Hash[metric_hash.map { |k,v| ["#{@opts[:metrics_prefix]}.#{k}", v]}]
+          if @opts[:verbose]
             puts "Sending data to graphite..."
             ap @metric_hash_with_hostname
           end

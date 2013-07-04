@@ -40,7 +40,10 @@ module Mongodb
 
 
           unless (@opts[:dry_run])
-            graphite_writer = GraphiteWriter.new(@opts[:graphite_host], @opts[:graphite_port], @opts[:verbose])
+            graphite_writer = GraphiteWriter.new({:host => @opts[:graphite_host],
+                                                  :port => @opts[:graphite_port],
+                                                  :verbose => @opts[:verbose],
+                                                  :metrics_prefix => @opts[:graphite_metrics_prefix]})
             graphite_writer.write(metric_hash)
             graphite_writer.write(opcounters_per_second_metric_hash)
           end

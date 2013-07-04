@@ -13,6 +13,7 @@ opts = Trollop::options do
   opt :mongodb_password, "MongoDB password", :type => :string
   opt :graphite_host, "Graphite host", :type => :string
   opt :graphite_port, "Graphite port", :type => :string
+  opt :graphite_metrics_prefix, "Graphite metrics prefix", :type => :string, :default => Socket.gethostname
   opt :dry_run, "Dry run", :type => :boolean, :default => false
   opt :verbose, "Verbose", :type => :boolean, :default => false
 end
