@@ -12,64 +12,68 @@ require 'mongodb/graphite/agent/op_counters_sample'
 module Mongodb
   module Graphite
     module Agent
-      def self.run(opts)
-        @connection = Mongo::MongoClient.new(opts.mongodb_host, opts.mongodb_port, :slave_ok => true)
-        unless(opts[:mongodb_username].blank? && opts[:mongodb_password].blank?)
-          @connection["admin"].authenticate(opts.mongodb_username, opts.mongodb_password)
+      class Runner
+
+        def initialize(opts)
+          @opts = opts
         end
 
-        @hash = @connection["local"].command('serverStatus' => 1)
+        def run
+          connection = Mongo::MongoClient.new(@opts.mongodb_host, @opts.mongodb_port, :slave_ok => true)
+          unless (@opts[:mongodb_username].blank? && @opts[:mongodb_password].blank?)
+            connection["admin"].authenticate(@opts.mongodb_username, @opts.mongodb_password)
+          end
 
-        @graphite_writer = GraphiteWriter.new(opts[:graphite_host], opts[:graphite_port], opts[:verbose])
+          server_status_result = connection["local"].command('serverStatus' => 1)
+          metric_hash = Utils.to_hash(server_status_result).select { |k|
+            k.match('^connection|^network\.|^cursors|^mem\.mapped|^indexCounters|^repl.oplog')
+          }
 
-#puts @hash["connections"]["current"]
-#puts @hash["connections"]["available"]
-#
-#puts @hash["backgroundFlushing"]["average_ms"]
-#
-#puts @hash["network"]["numRequests"]
-#puts @hash["network"]["bytesIn"]
-#puts @hash["network"]["bytesOut"]
-#
-#
-#puts @hash["cursors"]["totalOpen"]
-#
-#puts @hash["indexCounters"]["missRatio"]
+          opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcounters"]
 
-        @asd = Utils.to_hash(@hash) #all metrics
+          if @opts[:verbose]
+            puts "Calculating metrics..."
+            ap metric_hash
+            ap opcounters_per_second_metric_hash
+          end
 
 
-        @current_sample = OpCountersSample.new Hash[@hash["opcounters"]]
-        @previous_sample = @current_sample.dup
 
-        if File.exist? 'lastsample'
-          File.open('lastsample', 'r') do |file|
-            @previous_sample = Marshal.load(file)
-            #puts "Loaded object"
-            #ap(@previous_sample)
+          unless (@opts[:dry_run])
+            graphite_writer = GraphiteWriter.new(@opts[:graphite_host], @opts[:graphite_port], @opts[:verbose])
+            graphite_writer.write(metric_hash)
+            graphite_writer.write(opcounters_per_second_metric_hash)
           end
         end
 
-        @delta = TimeDifference.between(Time.parse(@current_sample.sample_time), Time.parse(@previous_sample.sample_time))
-        puts "Last sample was taken #{@delta.in_seconds.round(0)} seconds ago" if opts[:verbose]
+        def calculate_opcounters_per_second(opcounters)
+          current_sample = OpCountersSample.new Hash[opcounters]
+          previous_sample = current_sample.dup
+          result = {}
 
-        @previous_sample.values.keys.sort.each do |k|
-          previous_sample_value = @previous_sample.values[k]
-          current_sample_value = @current_sample.values[k]
-          value_per_seconds = ((current_sample_value - previous_sample_value) / @delta.in_seconds).round(2)
-          puts "#{k}: #{previous_sample_value} / #{current_sample_value}: #{value_per_seconds}/s" if opts[:verbose]
+          if File.exist? 'lastsample'
+            File.open('lastsample', 'r') do |file|
+              previous_sample = Marshal.load(file)
+            end
+          end
+
+          delta = TimeDifference.between(Time.parse(current_sample.sample_time), Time.parse(previous_sample.sample_time))
+          puts "Last sample was taken #{delta.in_seconds.round(0)} seconds ago"
+
+          previous_sample.values.keys.sort.each do |k|
+            previous_sample_value = previous_sample.values[k]
+            current_sample_value = current_sample.values[k]
+            value_per_seconds = ((current_sample_value - previous_sample_value) / delta.in_seconds).round(2)
+            result["#{k}_per_seconds"] = value_per_seconds
+          end
+
+          File.open('lastsample', 'w') do |file|
+            Marshal.dump(current_sample, file)
+          end
+
+          result
         end
-
-        File.open('lastsample', 'w') do |file|
-          Marshal.dump(@current_sample, file)
-        end
-
-        @graphite_writer.write( @asd.select {|k| k.match('^connection|^network\.|^cursors|^mem\.mapped|^indexCounters|^repl.oplog') } )
-        #@graphite_writer.write("connections.current" => @hash["connections"]["current"]) unless(opts[:dry_run])
       end
     end
   end
-end
-class GraphiteWriter
-
 end

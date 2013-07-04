@@ -22,6 +22,8 @@ if opts[:dry_run]
   sleep 1
 end
 
-#@writer = Mongodb::Graphite::Agent::GraphiteWriter.new("localhost", 12)
-#@writer.write ({ "antani" => 5, "boh" => 1 })
-Mongodb::Graphite::Agent.run(opts)
+Trollop::die :mongodb_host, "must be specified" unless opts[:mongodb_host]
+Trollop::die :graphite_host, "(or --dry-run) must be specified " if (opts[:graphite_host].blank? and opts[:dry_run].blank?)
+
+runner = Mongodb::Graphite::Agent::Runner.new(opts)
+runner.run
