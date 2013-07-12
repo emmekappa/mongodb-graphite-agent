@@ -11,6 +11,7 @@ opts = Trollop::options do
   opt :mongodb_host, "MongoDB host", :type => :string, :default => "localhost"
   opt :mongodb_post, "MongoDB host", :type => :int, :default => 27017
   opt :mongodb_password, "MongoDB password", :type => :string
+  opt :mongodb_replicaset, "Set this flag if the host is part of a MongoDB replicaSet", :type => :boolean, :default => false
   opt :graphite_host, "Graphite host", :type => :string
   opt :graphite_port, "Graphite port", :type => :string
   opt :graphite_metrics_prefix, "Graphite metrics prefix", :type => :string, :default => Socket.gethostname
@@ -23,8 +24,7 @@ if opts[:dry_run]
   sleep 1
 end
 
-Trollop::die :mongodb_host, "must be specified" unless opts[:mongodb_host]
-Trollop::die :graphite_host, "(or --dry-run) must be specified " if (opts[:graphite_host].blank? and opts[:dry_run].blank?)
+Trollop::die :graphite_host, "(or --dry-run) must be specified" if (opts[:graphite_host].blank? and opts[:dry_run].blank?)
 
 runner = Mongodb::Graphite::Agent::Runner.new(opts)
 runner.run

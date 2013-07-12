@@ -29,14 +29,17 @@ module Mongodb
             k.match('^connection|^network\.|^cursors|^mem\.mapped|^indexCounters|^repl.oplog')
           }
 
-          opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcounters"]
+          unless (@opts[:mongodb_replicaset].blank?)
+            opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcountersRepl"]
+          else
+            opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcounters"]
+          end
 
           if @opts[:verbose]
             puts "Calculating metrics..."
             ap metric_hash
             ap opcounters_per_second_metric_hash
           end
-
 
 
           unless (@opts[:dry_run])
