@@ -1,6 +1,8 @@
 # Mongodb::Graphite::Agent
 
-TODO: Write a gem description
+[![Build Status](https://travis-ci.org/emmekappa/mongodb-graphite-agent.png)](https://travis-ci.org/emmekappa/mongodb-graphite-agent)
+
+Sends MongoDB metrics to Graphite.
 
 ## Installation
 
@@ -18,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+    mongodb-graphite-agent.rb --mongodb-host localhost --graphite-host graphite.local --graphite-port 9090 --graphite-metrics-prefix "localhost.mongodb" --verbose
 
 ## Contributing
 
