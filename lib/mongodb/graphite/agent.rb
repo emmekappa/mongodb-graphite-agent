@@ -8,6 +8,7 @@ require 'awesome_print'
 require 'time_difference'
 require 'mongodb/graphite/agent/utils'
 require 'mongodb/graphite/agent/op_counters_sample'
+require 'mongodb/graphite/agent/mongo_cient_extensions'
 
 module Mongodb
   module Graphite
@@ -29,9 +30,11 @@ module Mongodb
             k.match('^connection|^network\.|^cursors|^mem\.mapped|^indexCounters|^repl.oplog')
           }
 
-          unless (@opts[:mongodb_replicaset].blank?)
+          if (connection.is_replicaset?)
+            puts "ReplicaSet detected" if @opts[:verbose]
             opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcountersRepl"]
           else
+            puts "Single host mode detected" if @opts[:verbose]
             opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcounters"]
           end
 
