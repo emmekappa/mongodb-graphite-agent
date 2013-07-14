@@ -30,13 +30,7 @@ module Mongodb
             k.match('^connection|^network\.|^cursors|^mem\.mapped|^indexCounters|^repl.oplog')
           }
 
-          if (connection.is_replicaset?)
-            puts "ReplicaSet detected" if @opts[:verbose]
-            opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcountersRepl"]
-          else
-            puts "Single host mode detected" if @opts[:verbose]
-            opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcounters"]
-          end
+          opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcounters"]
 
           if @opts[:verbose]
             puts "Calculating metrics..."
