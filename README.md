@@ -6,16 +6,6 @@ Sends MongoDB metrics to Graphite.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'mongodb-graphite-agent'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
     $ gem install mongodb-graphite-agent
 
 ## Usage
