@@ -20,7 +20,7 @@ module Mongodb
         end
 
         def run
-          connection = Mongo::MongoClient.new(@opts.mongodb_host, @opts.mongodb_port, :slave_ok => true)
+          connection = Mongo::MongoClient.new(@opts[:mongodb_host], @opts[:mongodb_port], :slave_ok => true)
           unless (@opts[:mongodb_username].blank? && @opts[:mongodb_password].blank?)
             connection["admin"].authenticate(@opts.mongodb_username, @opts.mongodb_password)
           end
