@@ -4,6 +4,7 @@ $:.unshift File.expand_path("#{File.dirname(__FILE__)}/../lib")
 
 require 'trollop'
 require 'mongodb/graphite/agent'
+require 'mongodb/graphite/agent/graphite_writer'
 
 opts = Trollop::options do
   opt :mongodb_username, "MongoDB username", :type => :string
