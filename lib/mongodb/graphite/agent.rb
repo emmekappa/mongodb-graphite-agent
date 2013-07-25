@@ -9,6 +9,7 @@ require 'time_difference'
 require 'mongodb/graphite/agent/utils'
 require 'mongodb/graphite/agent/op_counters_sample'
 require 'mongodb/graphite/agent/mongo_cient_extensions'
+require 'mongodb/graphite/agent/collection_size_calculator'
 
 module Mongodb
   module Graphite
@@ -31,11 +32,13 @@ module Mongodb
           }
 
           opcounters_per_second_metric_hash = calculate_opcounters_per_second server_status_result["opcounters"]
+          total_collections_hash = CollectionSizeCalculator.new(connection).calculate
 
           if @opts[:verbose]
             puts "Calculating metrics..."
             ap metric_hash
             ap opcounters_per_second_metric_hash
+            ap total_collections_hash
           end
 
 
@@ -46,6 +49,7 @@ module Mongodb
                                                   :metrics_prefix => @opts[:graphite_metrics_prefix]})
             graphite_writer.write(metric_hash)
             graphite_writer.write(opcounters_per_second_metric_hash)
+            graphite_writer.write(total_collections_hash)
           end
         end
 
