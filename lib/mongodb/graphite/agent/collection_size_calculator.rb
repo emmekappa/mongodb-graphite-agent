@@ -13,12 +13,10 @@ module Mongodb
           collection_count_hash = {}
           @mongo_client.database_names.each { |db_name|
             @mongo_client[db_name].collection_names.each { |collection_name|
-
-
               collection_count_hash["collection_sizes.#{db_name}.#{collection_name}"] = @mongo_client[db_name][collection_name].stats()["count"]
             } unless db_name == 'local'
           }
-
+          collection_count_hash["total_documents"] = collection_count_hash.values.inject { |sum,x| sum+x }
           return collection_count_hash
         end
 
