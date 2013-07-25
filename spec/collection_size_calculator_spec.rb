@@ -4,7 +4,9 @@ require 'mongo'
 
 describe 'Collection size calculator' do
   it 'should calculate the number of documents in all db collections' do
-    collection_size_calculator = Mongodb::Graphite::Agent::CollectionSizeCalculator.new(Mongo::MongoClient.new())
+    connection = Mongo::MongoClient.new()
+    connection["test"]["lol"].save({ asd: 1})
+    collection_size_calculator = Mongodb::Graphite::Agent::CollectionSizeCalculator.new(connection)
     collection_size_calculator.calculate.should have_at_least(1).items
   end
 end
